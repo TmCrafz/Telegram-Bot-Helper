@@ -4,5 +4,7 @@
 
 int main(int argc, char *argv[])
 {
+	//std::cout << CurlHelper::simplePost("", "") << std::endl;
+	std::cout << "After simplePost" << std::endl;
 	return 0;
 }

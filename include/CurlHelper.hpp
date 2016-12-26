@@ -10,8 +10,6 @@ namespace CurlHelper
 	size_t writeToString(void *ptr, size_t size, size_t nmemb, void *stream);
 	// Simple post with parameters. Returns the response of the called url
 	std::string simplePost(std::string url, std::string postFields);
-	
-	
 }
 
 #endif // CURLHELPER_HPP
