@@ -10,11 +10,12 @@ size_t CurlHelper::writeToString(void *ptr, size_t size, size_t nmemb, void *str
 	return size*nmemb;
 }
 
-std::string CurlHelper::simplePost(std::string url, std::string postFields)
+std::pair<std::string, bool> CurlHelper::simplePost(std::string url, std::string postFields)
 {
+	bool success{ false };
 	// Remove old content from buffer
 	buffer.clear();
-
+	
 	CURL *curl;
 	CURLcode res;
 	curl_global_init(CURL_GLOBAL_ALL);
@@ -33,9 +34,13 @@ std::string CurlHelper::simplePost(std::string url, std::string postFields)
 		{
 			std::cerr << "curl_easy_perfom failed: " << curl_easy_strerror(res) << std::endl;
 		}
+		else
+		{
+			success = true;
+		}
 		// Clean up
 		curl_easy_cleanup(curl);
 	}
 	curl_global_cleanup();
-	return buffer;
+	return std::make_pair(buffer, success);
 }

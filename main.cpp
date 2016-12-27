@@ -14,21 +14,14 @@ int main(int argc, char *argv[])
 	std::string token{ argv[1] };
 	std::string chatId{ argv[2] };
 	tgb::TgBotHelper tgBot(token);	
-	tgBot.sendMessage(chatId, "Hello Im a Bot =)");
-	std::cout << "Message send" << std::endl;
-
-	//std::cout << CurlHelper::simplePost("", "") << std::endl;
-	//std::cout << "After simplePost" << std::endl;
-	nlohmann::json j = {
-		{"integer", 1},
-		{"string", "Test"}
-	};
-	int inj = j.value("integer", 0);
-	std::string stj = j.value("string", "Nope");
-	std::cout << "Int: " << inj << " string: " << stj << std::endl;
-	
-	std::string test = "Test Message";
-	nlohmann::json j2 = test;
-	std::cout << j2 << std::endl;
+	bool success{ tgBot.sendMessage(chatId, "Hello Im a Bot =)") };
+	if (success)
+	{
+		std::cout << "Message send" << std::endl;
+	}
+	else
+	{
+		std::cout << "Message send failed" << std::endl;
+	}
 	return 0;
 }
