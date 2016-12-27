@@ -1,4 +1,5 @@
 #include "include/CurlHelper.hpp"
+#include "include/libs/json.hpp"
 #include "include/TgBotHelper.hpp"
 #include <iostream>
 #include <string>
@@ -6,6 +7,7 @@
 
 int main(int argc, char *argv[])
 {
+	std::cout << sizeof(long) << std::endl;
 	if (argc < 3) 
 	{
 		std::cout << "Please specify token and chatId" << std::endl;
@@ -22,6 +24,11 @@ int main(int argc, char *argv[])
 	else
 	{
 		std::cout << "Message send failed" << std::endl;
+	}
+	while(true)
+	{
+		std::cout << "New Updates: \n";
+		tgBot.getNewTextUpdates();
 	}
 	return 0;
 }
