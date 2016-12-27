@@ -11,7 +11,7 @@ namespace tgb
 
 		public:
 			explicit TgBotHelper(std::string token);
-			void sendMessage(std::string chatId, std::string message);
+			bool sendMessage(std::string chatId, std::string message);
 	};
 }
 #endif // TGBOTHELPER_HPP

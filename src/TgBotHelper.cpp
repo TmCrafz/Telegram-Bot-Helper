@@ -1,5 +1,6 @@
 #include "../include/TgBotHelper.hpp"
 #include "../include/CurlHelper.hpp"
+#include "../include/libs/json.hpp"
 #include <iostream>
 
 tgb::TgBotHelper::TgBotHelper(std::string token)
@@ -8,9 +9,12 @@ tgb::TgBotHelper::TgBotHelper(std::string token)
 
 }
 
-void tgb::TgBotHelper::sendMessage(std::string chatId, std::string message)
+bool tgb::TgBotHelper::sendMessage(std::string chatId, std::string message)
 {
-	std::string response { CurlHelper::simplePost("https://api.telegram.org/bot" + m_token + "/sendMessage", 
+	std::string response = { CurlHelper::simplePost("https://api.telegram.org/bot" + m_token + "/sendMessage", 
 			"chat_id=" + chatId + "&text=" + message) };
-	std::cout << response << std::endl;
+	nlohmann::json jsn = nlohmann::json::parse(response);
+	// Check if post was successfull
+	bool success = jsn.value("ok", false);
+	return sucess; 
 }

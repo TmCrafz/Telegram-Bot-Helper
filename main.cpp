@@ -26,6 +26,9 @@ int main(int argc, char *argv[])
 	int inj = j.value("integer", 0);
 	std::string stj = j.value("string", "Nope");
 	std::cout << "Int: " << inj << " string: " << stj << std::endl;
-
+	
+	std::string test = "Test Message";
+	nlohmann::json j2 = test;
+	std::cout << j2 << std::endl;
 	return 0;
 }
