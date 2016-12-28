@@ -1,6 +1,9 @@
 #ifndef TGB_TGBOTHELPER_HPP
 #define TGB_TGBOTHELPER_HPP
+#include <vector>
+#include "Message.hpp"
 #include <string>
+#include <utility>
 
 namespace tgb 
 {
@@ -14,7 +17,8 @@ namespace tgb
 			explicit TgBotHelper(std::string token);
 
 			bool sendMessage(std::string chatId, std::string message);
-			std::string getNewTextUpdates();
+			// Returns the Messages and a bool which is true when the api call was successful
+			std::pair<std::vector<Message>, bool> getNewTextUpdates();
 
 	};
 }

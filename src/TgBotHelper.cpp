@@ -25,12 +25,13 @@ bool tgb::TgBotHelper::sendMessage(std::string chatId, std::string message)
 	return success; 
 }
 
-std::string tgb::TgBotHelper::getNewTextUpdates()
+std::pair<std::vector<tgb::Message>, bool> tgb::TgBotHelper::getNewTextUpdates()
 {
 	// With specifying the last retrieved message + 1, we guarantee that we only get updates we dont have already get 
 	std::pair<std::string, bool> response{ CurlHelper::simplePost("https://api.telegram.org/bot" + m_token + "/getUpdates", 
 			"offset=" + std::to_string(m_lastRetrieved + 1)) };
 	
+	std::vector<Message> messages;
 	bool success{ response.second };
 	if (success)
 	{
@@ -44,9 +45,25 @@ std::string tgb::TgBotHelper::getNewTextUpdates()
 			nlohmann::json::array_t resultArr = jsn.value("result", nlohmann::json::array_t());
 			for (auto entry : resultArr)
 			{
-				int updateId = entry.value("update_id", -1L);
-				std::cout << "UpdateId: " << updateId << std::endl;
-				std::cout << "Entry: \n" << entry << std::endl;
+				
+				long updateId{ entry.value("update_id", -1L) };		
+				// message		
+				nlohmann::json jsonMessage = entry.value("message", nlohmann::json());
+				long date{ jsonMessage.value("date", -1L) };
+				long messageId{ jsonMessage.value("message_id", -1L) };
+				std::string text{ jsonMessage.value("text", "") };
+				// message->chat
+				nlohmann::json jsonChat = jsonMessage.value("chat", nlohmann::json());
+				long chatId{ jsonChat.value("id", -1L) };
+				std::string chatFirstName{ jsonChat.value("first_name", "") };
+				// message->from
+				nlohmann::json jsonFrom = jsonMessage.value("from", nlohmann::json());
+				long authorId{ jsonFrom.value("id", -1L) };
+				std::string authorFirstName{ jsonFrom.value("first_name", "") };
+				
+				messages.push_back({ chatId, chatFirstName, date, authorId, 
+						authorFirstName, messageId, text, updateId});
+
 				// Make m_lastRetrieved update to actual update_id (When the update_id was in entry)
 				if (updateId > -1) 
 				{
@@ -56,5 +73,5 @@ std::string tgb::TgBotHelper::getNewTextUpdates()
 		}
 
 	}
-	return "";
+	return std::make_pair(messages, success);
 }
