@@ -1,5 +1,5 @@
-#ifndef TGBOTHELPER_HPP
-#define TGBOTHELPER_HPP
+#ifndef TGB_TGBOTHELPER_HPP
+#define TGB_TGBOTHELPER_HPP
 #include <string>
 
 namespace tgb 
@@ -18,4 +18,4 @@ namespace tgb
 
 	};
 }
-#endif // TGBOTHELPER_HPP
+#endif // TGB_TGBOTHELPER_HPP
