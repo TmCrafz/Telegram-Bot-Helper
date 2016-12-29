@@ -34,9 +34,6 @@ namespace tgb
 			     std::string lastName);
 		};
 
-
-
-
 		// The id of the chat (When it is not a group chat
 		// it is the same as the authorId)
 		long chatId;

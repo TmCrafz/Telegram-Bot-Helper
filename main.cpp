@@ -9,6 +9,7 @@
 
 int main(int argc, char *argv[])
 {
+	//std::cout << sizeof(tgb::Message) << std::endl;
 	if (argc < 3) 
 	{
 		std::cout << "Please specify token and chatId" << std::endl;
