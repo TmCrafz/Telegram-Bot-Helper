@@ -10,6 +10,11 @@ tgb::TgBotHelper::TgBotHelper(std::string token)
 
 }
 
+void tgb::TgBotHelper::setOnNewMessageListener(std::function<void(const std::vector<Message> &messages)> onNewMessageListener)
+{
+	m_onNewMessageListener = onNewMessageListener;
+}
+
 bool tgb::TgBotHelper::sendMessage(std::string chatId, std::string message)
 {
 	std::pair<std::string, bool> response{ CurlHelper::simplePost("https://api.telegram.org/bot" + m_token + "/sendMessage", 
@@ -74,4 +79,15 @@ std::pair<std::vector<tgb::Message>, bool> tgb::TgBotHelper::getNewTextUpdates()
 
 	}
 	return std::make_pair(messages, success);
+}
+
+void tgb::TgBotHelper::poll()
+{
+	std::pair<std::vector<Message>, bool> resultUpdates{ getNewTextUpdates() };
+	std::vector<Message> messages{ resultUpdates.first };
+	// Call the listener when there are new messages
+	if (messages.size() > 0 && m_onNewMessageListener)
+	{
+		m_onNewMessageListener(messages);
+	}
 }

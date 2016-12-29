@@ -9,7 +9,6 @@
 
 int main(int argc, char *argv[])
 {
-	std::cout << sizeof(long) << std::endl;
 	if (argc < 3) 
 	{
 		std::cout << "Please specify token and chatId" << std::endl;
@@ -17,7 +16,19 @@ int main(int argc, char *argv[])
 	}
 	std::string token{ argv[1] };
 	std::string chatId{ argv[2] };
-	tgb::TgBotHelper tgBot(token);	
+	tgb::TgBotHelper tgBot(token);
+	tgBot.setOnNewMessageListener([&tgBot] (const std::vector<tgb::Message> &messages)
+	{
+		for (const tgb::Message message: messages)
+		{
+			std::string text{ message.text };
+			long chatId{ message.chatId };
+			std::cout << "Text: " << message.text << " ChatId: " << chatId <<  std::endl;
+			tgBot.sendMessage(std::to_string(chatId), text);
+		}
+				
+	});
+
 	//bool success{ tgBot.sendMessage(chatId, "Hello Im a Bot =)") };
 	//if (success)
 	//{
@@ -29,25 +40,26 @@ int main(int argc, char *argv[])
 	//}
 	while(true)
 	{
-		std::cout << "New Updates: \n";
-		std::pair<std::vector<tgb::Message>, bool> result = 
-			tgBot.getNewTextUpdates();
-		if (!result.second)
-		{
-			std::cout << "Error by retrieving Messages" << std::endl;
-			continue;
-		}
-		for (tgb::Message message: result.first)
-		{
-			std::cout << "ChatId: " << message.chatId << std::endl <<
-						"ChatFirstName: " << message.chatFirstName << std::endl <<
-						"Date: " << message.date << std::endl <<
-						"AuthorId: " << message.authorId << std::endl <<
-						"AuthorFirstName: " << message.authorFirstName << std::endl <<
-						"MessageId: " << message.messageId << std::endl <<
-						"Text: " << message.text << std::endl <<
-						"UpdateId: " << message.updateId << std::endl << std::endl; 
-		}
+		tgBot.poll();
+		//std::cout << "New Updates: \n";
+		//std::pair<std::vector<tgb::Message>, bool> result = 
+			//tgBot.getNewTextUpdates();
+		//if (!result.second)
+		//{
+			//std::cout << "Error by retrieving Messages" << std::endl;
+			//continue;
+		//}
+		//for (tgb::Message message: result.first)
+		//{
+			//std::cout << "ChatId: " << message.chatId << std::endl <<
+						//"ChatFirstName: " << message.chatFirstName << std::endl <<
+						//"Date: " << message.date << std::endl <<
+						//"AuthorId: " << message.authorId << std::endl <<
+						//"AuthorFirstName: " << message.authorFirstName << std::endl <<
+						//"MessageId: " << message.messageId << std::endl <<
+						//"Text: " << message.text << std::endl <<
+						//"UpdateId: " << message.updateId << std::endl << std::endl; 
+		//}
 	}
 	return 0;
 }
