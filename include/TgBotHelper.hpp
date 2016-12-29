@@ -21,7 +21,7 @@ namespace tgb
 			
 			void setOnNewMessageListener(std::function<void(const std::vector<Message> &messages)> onNewMessageListener);
 
-			bool sendMessage(std::string chatId, std::string message);
+			bool sendMessage(long chatId, std::string message);
 			// Returns the Messages and a bool which is true when the api call was successful
 			std::pair<std::vector<Message>, bool> getNewTextUpdates();
 			

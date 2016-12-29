@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 			std::string text{ message.text };
 			long chatId{ message.chatId };
 			std::cout << "Text: " << message.text << " ChatId: " << chatId <<  std::endl;
-			tgBot.sendMessage(std::to_string(chatId), text);
+			tgBot.sendMessage(chatId, text);
 		}
 				
 	});
