@@ -1,5 +1,6 @@
 #ifndef TGB_MESSAGE_HPP
 #define TGB_MESSAGE_HPP
+#include <memory>
 #include <string>
 
 namespace tgb
@@ -34,21 +35,20 @@ namespace tgb
 			     std::string lastName);
 		};
 
-		// The id of the chat (When it is not a group chat
-		// it is the same as the authorId)
-		long chatId;
-		std::string chatFirstName;
-		// Unix time
-		long date;
-		long authorId;
-		std::string authorFirstName;
+		
 		long messageId;
+		long date;
 		std::string text;
-		long updateId;
+		std::shared_ptr<Chat> chat;
+		// Called "from" in json response
+		std::shared_ptr<User> user;
+		
+		Message();
 
-		Message(long chatId, std::string chatFirstName, long date,
-		        long authorId, std::string authorFirstName, 
-		        long messageId, std::string text, long updateId);
+		Message(long messageId, long date,
+		        std::string text, std::shared_ptr<Chat> chat,
+				std::shared_ptr<User> user);
+
 	};
 }
 

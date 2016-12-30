@@ -54,20 +54,35 @@ std::pair<std::vector<tgb::Message>, bool> tgb::TgBotHelper::getNewTextUpdates()
 				long updateId{ entry.value("update_id", -1L) };		
 				// message		
 				nlohmann::json jsonMessage = entry.value("message", nlohmann::json());
-				long date{ jsonMessage.value("date", -1L) };
 				long messageId{ jsonMessage.value("message_id", -1L) };
+				long date{ jsonMessage.value("date", -1L) };
 				std::string text{ jsonMessage.value("text", "") };
 				// message->chat
 				nlohmann::json jsonChat = jsonMessage.value("chat", nlohmann::json());
 				long chatId{ jsonChat.value("id", -1L) };
+				std::string chatType{ jsonChat.value("type", "") };
+				std::string chatTitle{ jsonChat.value("title", "") };
+				std::string chatUsername{ jsonChat.value("username", "") };
 				std::string chatFirstName{ jsonChat.value("first_name", "") };
-				// message->from
-				nlohmann::json jsonFrom = jsonMessage.value("from", nlohmann::json());
-				long authorId{ jsonFrom.value("id", -1L) };
-				std::string authorFirstName{ jsonFrom.value("first_name", "") };
-				
-				messages.push_back({ chatId, chatFirstName, date, authorId, 
-						authorFirstName, messageId, text, updateId});
+				std::string chatLastName{ jsonChat.value("last_name", "") };
+				bool chatAllMembersAdmins{ jsonChat.value("all_members_are_administrators", false) };
+				std::shared_ptr<Message::Chat> chat{ std::make_shared<Message::Chat>(chatId, chatType,
+					chatTitle, chatUsername, chatFirstName, chatLastName, chatAllMembersAdmins) };
+
+				// message->from.
+				std::shared_ptr<Message::User> user{ nullptr };
+				// From is optional so we first check if it is in json response
+				if (jsonMessage.count("from") > 0)
+				{
+					nlohmann::json jsonFrom = jsonMessage.value("from", nlohmann::json());
+					long userId{ jsonFrom.value("id", -1L) };
+					std::string userUsername{ jsonFrom.value("username", "") };
+					std::string userFirstName{ jsonFrom.value("first_name", "") };
+					std::string userLastName{ jsonFrom.value("last_name", "") };
+					user = std::make_shared<Message::User>(userId, userUsername,
+						userFirstName, userLastName);
+				}
+				messages.push_back({ messageId, date, text, std::move(chat), std::move(user) });
 
 				// Make m_lastRetrieved update to actual update_id (When the update_id was in entry)
 				if (updateId > -1) 

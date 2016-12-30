@@ -1,6 +1,5 @@
 #include "../include/Message.hpp"
 
-
 tgb::Message::User::User()
 : id{ 0L }
 , username{ "" }
@@ -10,7 +9,7 @@ tgb::Message::User::User()
 
 }
 tgb::Message::User::User(long id, std::string username, std::string firstName,
-			     std::string lastName)
+						std::string lastName)
 : id{ id }
 , username{ username }
 , firstName{ firstName }
@@ -46,17 +45,14 @@ tgb::Message::Chat::Chat(long id, std::string type, std::string title,
 
 }
 
-tgb::Message::Message(long chatId, std::string chatFirstName, long date,
-				long authorId, std::string authorFirstName, 
-				long messageId, std::string text, long updateId)
-: chatId{ chatId }
-, chatFirstName{ chatFirstName }
+tgb::Message::Message(long messageId, long date,
+			std::string text, std::shared_ptr<Chat> chat,
+			std::shared_ptr<User> user)
+: messageId{ messageId }
 , date{ date }
-, authorId{ authorId }
-, authorFirstName{ authorFirstName }
-, messageId{ messageId }
 , text{ text }
-, updateId{ updateId }
+, chat{ chat }
+, user{ user }
 {
 
 }

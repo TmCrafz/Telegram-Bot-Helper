@@ -9,7 +9,6 @@
 
 int main(int argc, char *argv[])
 {
-	//std::cout << sizeof(tgb::Message) << std::endl;
 	if (argc < 3) 
 	{
 		std::cout << "Please specify token and chatId" << std::endl;
@@ -25,8 +24,13 @@ int main(int argc, char *argv[])
 		for (const tgb::Message message: messages)
 		{
 			std::string text{ message.text };
-			long chatId{ message.chatId };
-			std::cout << "Text: " << message.text << " ChatId: " << chatId <<  std::endl;
+			long chatId{ message.chat->id };
+			std::cout << "Text: " << message.text << " ChatId: " << chatId; 
+			if (message.user)
+			{
+				std::cout << " FirstName: " << message.user->firstName;
+			}
+			std::cout << std::endl;
 			tgBot.sendMessage(chatId, text);
 		}
 				
