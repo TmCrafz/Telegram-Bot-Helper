@@ -1,6 +1,5 @@
 #include "../include/TgBotHelper.hpp"
 #include "../include/CurlHelper.hpp"
-#include "../include/libs/json.hpp"
 #include <iostream>
 
 tgb::TgBotHelper::TgBotHelper(std::string token)
@@ -58,30 +57,11 @@ std::pair<std::vector<tgb::Message>, bool> tgb::TgBotHelper::getNewTextUpdates()
 				long date{ jsonMessage.value("date", -1L) };
 				std::string text{ jsonMessage.value("text", "") };
 				// message->chat
-				nlohmann::json jsonChat = jsonMessage.value("chat", nlohmann::json());
-				long chatId{ jsonChat.value("id", -1L) };
-				std::string chatType{ jsonChat.value("type", "") };
-				std::string chatTitle{ jsonChat.value("title", "") };
-				std::string chatUsername{ jsonChat.value("username", "") };
-				std::string chatFirstName{ jsonChat.value("first_name", "") };
-				std::string chatLastName{ jsonChat.value("last_name", "") };
-				bool chatAllMembersAdmins{ jsonChat.value("all_members_are_administrators", false) };
-				std::shared_ptr<Message::Chat> chat{ std::make_shared<Message::Chat>(chatId, chatType,
-					chatTitle, chatUsername, chatFirstName, chatLastName, chatAllMembersAdmins) };
+				std::shared_ptr<Message::Chat> chat{ getChatFromJson(jsonMessage) };
 
 				// message->from.
-				std::shared_ptr<Message::User> user{ nullptr };
-				// From is optional so we first check if it is in json response
-				if (jsonMessage.count("from") > 0)
-				{
-					nlohmann::json jsonFrom = jsonMessage.value("from", nlohmann::json());
-					long userId{ jsonFrom.value("id", -1L) };
-					std::string userUsername{ jsonFrom.value("username", "") };
-					std::string userFirstName{ jsonFrom.value("first_name", "") };
-					std::string userLastName{ jsonFrom.value("last_name", "") };
-					user = std::make_shared<Message::User>(userId, userUsername,
-						userFirstName, userLastName);
-				}
+				std::shared_ptr<Message::User> user{ getUserFromJson(jsonMessage) };
+				
 				messages.push_back({ messageId, date, text, std::move(chat), std::move(user) });
 
 				// Make m_lastRetrieved update to actual update_id (When the update_id was in entry)
@@ -105,4 +85,42 @@ void tgb::TgBotHelper::handleUpdates()
 	{
 		m_onNewMessageListener(messages);
 	}
+}
+
+
+std::shared_ptr<tgb::Message::Chat> tgb::TgBotHelper::getChatFromJson(const nlohmann::json &json) const
+{
+
+	std::shared_ptr<Message::Chat> chat{ nullptr };
+	if (json.count("from") > 0)
+	{
+		nlohmann::json jsonChat = json.value("chat", nlohmann::json());
+		long id{ jsonChat.value("id", -1L) };
+		std::string type{ jsonChat.value("type", "") };
+		std::string title{ jsonChat.value("title", "") };
+		std::string username{ jsonChat.value("username", "") };
+		std::string firstName{ jsonChat.value("first_name", "") };
+		std::string lastName{ jsonChat.value("last_name", "") };
+		bool allMembersAdmins{ jsonChat.value("all_members_are_administrators", false) };
+		chat = std::make_shared<Message::Chat>(id, type,
+			title, username, firstName, lastName, allMembersAdmins);
+	}
+	return std::move(chat);
+		
+}
+
+std::shared_ptr<tgb::Message::User> tgb::TgBotHelper::getUserFromJson(const nlohmann::json &json) const
+{
+	std::shared_ptr<Message::User> user{ nullptr };
+	if (json.count("from") > 0)
+	{
+		nlohmann::json jsonFrom = json.value("from", nlohmann::json());
+		long id{ jsonFrom.value("id", -1L) };
+		std::string username{ jsonFrom.value("username", "") };
+		std::string firstName{ jsonFrom.value("first_name", "") };
+		std::string lastName{ jsonFrom.value("last_name", "") };
+		user = std::make_shared<Message::User>(id, username,
+			firstName, lastName);
+	}
+	return std::move(user);
 }
