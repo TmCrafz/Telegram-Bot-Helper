@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 	//}
 	while(true)
 	{
-		tgBot.poll();
+		tgBot.handleUpdates();
 		//std::cout << "New Updates: \n";
 		//std::pair<std::vector<tgb::Message>, bool> result = 
 			//tgBot.getNewTextUpdates();

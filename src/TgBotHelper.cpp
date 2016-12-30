@@ -96,7 +96,7 @@ std::pair<std::vector<tgb::Message>, bool> tgb::TgBotHelper::getNewTextUpdates()
 	return std::make_pair(messages, success);
 }
 
-void tgb::TgBotHelper::poll()
+void tgb::TgBotHelper::handleUpdates()
 {
 	std::pair<std::vector<Message>, bool> resultUpdates{ getNewTextUpdates() };
 	std::vector<Message> messages{ resultUpdates.first };

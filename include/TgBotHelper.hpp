@@ -26,7 +26,7 @@ namespace tgb
 			std::pair<std::vector<Message>, bool> getNewTextUpdates();
 			
 			// Retrieve updates and call listeners
-			void poll();
+			void handleUpdates();
 
 	};
 }
