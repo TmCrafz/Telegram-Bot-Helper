@@ -14,8 +14,6 @@ int main(int argc, char *argv[])
 		std::cout << "Please specify token and chatId" << std::endl;
 		return 0;
 	}
-	tgb::Message::Chat chat(1, "", "", "", "", "", false);
-	std::cout << "Message: " << chat.id << std::endl;
 	std::string token{ argv[1] };
 	std::string chatId{ argv[2] };
 	tgb::TgBotHelper tgBot(token);
