@@ -16,10 +16,8 @@ std::pair<std::string, bool> CurlHelper::simplePost(const std::string &url, cons
 	// Remove old content from buffer
 	buffer.clear();
 	
-	CURL *curl;
-	CURLcode res;
 	curl_global_init(CURL_GLOBAL_ALL);
-	curl = curl_easy_init();
+	CURL *curl{ curl_easy_init() };
 	if (curl)
 	{
 		// Set url (http:// or https://)
@@ -29,7 +27,7 @@ std::pair<std::string, bool> CurlHelper::simplePost(const std::string &url, cons
 		// Use helper function to store output in std::string
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeToString);
 		// Perfom request. (Store return code in res)
-		res = curl_easy_perform(curl);
+		CURLcode res{ curl_easy_perform(curl) };
 		if (res != CURLE_OK)
 		{
 			std::cerr << "curl_easy_perfom failed: " << curl_easy_strerror(res) << std::endl;
@@ -53,13 +51,11 @@ std::pair<std::string, bool> CurlHelper::fileFormPost(const std::string &url, co
 	// Remove old content from buffer
 	buffer.clear();
 
-	CURL *curl;
-	CURLcode res;
-	curl_httppost *formpost = nullptr;
-	curl_httppost *lastptr = nullptr;
 	
 	curl_global_init(CURL_GLOBAL_ALL);
 
+	curl_httppost *formpost{ nullptr };
+	curl_httppost *lastptr{ nullptr };
 	// Fill file field
 	curl_formadd(&formpost,
                &lastptr,
@@ -69,7 +65,7 @@ std::pair<std::string, bool> CurlHelper::fileFormPost(const std::string &url, co
                CURLFORM_END);
 
 	
-	curl = curl_easy_init();
+	CURL *curl = { curl_easy_init() };
 	if (curl)
 	{
 		// Set url (http:// or https://)
@@ -79,7 +75,7 @@ std::pair<std::string, bool> CurlHelper::fileFormPost(const std::string &url, co
 		// Set the form post data
 		curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
 		// Perfom request. (Store return code in res)
-		res = curl_easy_perform(curl);
+		CURLcode res{ curl_easy_perform(curl) };
 		if (res != CURLE_OK)
 		{
 			std::cerr << "curl_easy_perfom failed: " << curl_easy_strerror(res) << std::endl;
