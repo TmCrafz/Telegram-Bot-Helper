@@ -14,9 +14,27 @@ int main(int argc, char *argv[])
 		std::cout << "Please specify token and chatId" << std::endl;
 		return 0;
 	}
+		
 	std::string token{ argv[1] };
 	std::string chatId{ argv[2] };
 	tgb::TgBotHelper tgBot(token);
+	if (argc > 3)
+	{
+		std::string fileName{ argv[3] };
+		//std::cout << "Filename: " << fileName << std::endl;
+		
+		bool success{ tgBot.sendPhoto(std::stol(chatId), fileName) };
+		if (success)
+		{
+			std::cout << "Successfully send Photo" << std::endl;
+		}
+		else
+		{
+			std::cout << "Error by sending Photo" << std::endl;
+		}
+
+	}
+	
 	tgBot.setOnNewMessageListener([&tgBot] (const std::vector<tgb::Message> &messages)
 	{
 		for (const tgb::Message message: messages)

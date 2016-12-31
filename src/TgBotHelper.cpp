@@ -14,10 +14,29 @@ void tgb::TgBotHelper::setOnNewMessageListener(std::function<void(const std::vec
 	m_onNewMessageListener = onNewMessageListener;
 }
 
-bool tgb::TgBotHelper::sendMessage(long chatId, std::string message)
+bool tgb::TgBotHelper::sendMessage(const long chatId, const std::string message) const
 {
 	std::pair<std::string, bool> response{ CurlHelper::simplePost("https://api.telegram.org/bot" + m_token + "/sendMessage", 
 			"chat_id=" + std::to_string(chatId) + "&text=" + message) };
+	bool success{ response.second };
+	if (success)
+	{
+		// Post was successful
+		nlohmann::json jsn = nlohmann::json::parse(response.first);
+		// Check if bot api reports successfully processing , too 
+		success = jsn.value("ok", false);
+	}
+	return success; 
+}
+
+bool tgb::TgBotHelper::sendPhoto(const long chatId, const std::string fileName) const
+{
+
+	std::string command{ "chat_id=" + std::to_string(chatId) + " -F photo='@" + fileName + "'" };	
+	std::cout << "Command: " << command << std::endl;
+	std::pair<std::string, bool> response{ CurlHelper::simplePost("https://api.telegram.org/bot" + m_token + "/sendPhoto", 
+			command) };
+	
 	bool success{ response.second };
 	if (success)
 	{
