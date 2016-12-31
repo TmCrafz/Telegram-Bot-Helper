@@ -10,7 +10,7 @@ size_t CurlHelper::writeToString(void *ptr, size_t size, size_t nmemb, void *str
 	return size*nmemb;
 }
 
-std::pair<std::string, bool> CurlHelper::simplePost(std::string url, std::string postFields)
+std::pair<std::string, bool> CurlHelper::simplePost(const std::string &url, const std::string &postFields)
 {
 	bool success{ false };
 	// Remove old content from buffer
@@ -46,7 +46,8 @@ std::pair<std::string, bool> CurlHelper::simplePost(std::string url, std::string
 }
 
 
-std::pair<std::string, bool> CurlHelper::fileFormPost(std::string url, std::string fieldName, std::string fileName)
+std::pair<std::string, bool> CurlHelper::fileFormPost(const std::string &url, const std::string &fieldName, 
+		const std::string &fileName)
 {
 	bool success{ false };
 	// Remove old content from buffer

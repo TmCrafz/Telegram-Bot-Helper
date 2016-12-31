@@ -18,12 +18,12 @@ namespace tgb
 
 			std::function<void(const std::vector<Message> &messages)> m_onNewMessageListener;
 		public:
-			explicit TgBotHelper(std::string token);
+			explicit TgBotHelper(const std::string token);
 			
 			void setOnNewMessageListener(std::function<void(const std::vector<Message> &messages)> onNewMessageListener);
 
-			bool sendMessage(const long chatId, const std::string message) const;
-			bool sendPhoto(const long chatId, const std::string fileName) const;
+			bool sendMessage(const long chatId, const std::string &message) const;
+			bool sendPhoto(const long chatId, const std::string &fileName) const;
 			// Returns the essages and a bool which is true when the api call was successful
 			std::pair<std::vector<Message>, bool> getNewTextUpdates();
 			

@@ -2,7 +2,7 @@
 #include "../include/CurlHelper.hpp"
 #include <iostream>
 
-tgb::TgBotHelper::TgBotHelper(std::string token)
+tgb::TgBotHelper::TgBotHelper(const std::string token)
 : m_token{ token }
 , m_lastRetrieved{ -1L }
 {
@@ -14,7 +14,7 @@ void tgb::TgBotHelper::setOnNewMessageListener(std::function<void(const std::vec
 	m_onNewMessageListener = onNewMessageListener;
 }
 
-bool tgb::TgBotHelper::sendMessage(const long chatId, const std::string message) const
+bool tgb::TgBotHelper::sendMessage(const long chatId, const std::string &message) const
 {
 	std::pair<std::string, bool> response{ CurlHelper::simplePost("https://api.telegram.org/bot" + m_token + "/sendMessage", 
 			"chat_id=" + std::to_string(chatId) + "&text=" + message) };
@@ -22,7 +22,7 @@ bool tgb::TgBotHelper::sendMessage(const long chatId, const std::string message)
 	return success; 
 }
 
-bool tgb::TgBotHelper::sendPhoto(const long chatId, const std::string fileName) const
+bool tgb::TgBotHelper::sendPhoto(const long chatId, const std::string &fileName) const
 {
 	std::pair<std::string, bool> response{ CurlHelper::fileFormPost("https://api.telegram.org/bot" + m_token + 
 			"/sendPhoto?chat_id=" +  std::to_string(chatId), "photo", fileName) };
