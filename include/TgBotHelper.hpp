@@ -33,6 +33,9 @@ namespace tgb
 		private:
 			std::shared_ptr<Message::Chat> getChatFromJson(const nlohmann::json &json) const;
 			std::shared_ptr<Message::User> getUserFromJson(const nlohmann::json &json) const;
+			// Returns true if the given string contains that the action of the response was successfully
+			bool isResponseOk(const std::string &response) const;
+
 	};
 }
 #endif // TGB_TGBOTHELPER_HPP

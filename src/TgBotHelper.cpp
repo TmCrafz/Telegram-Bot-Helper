@@ -18,14 +18,7 @@ bool tgb::TgBotHelper::sendMessage(const long chatId, const std::string message)
 {
 	std::pair<std::string, bool> response{ CurlHelper::simplePost("https://api.telegram.org/bot" + m_token + "/sendMessage", 
 			"chat_id=" + std::to_string(chatId) + "&text=" + message) };
-	bool success{ response.second };
-	if (success)
-	{
-		// Post was successful
-		nlohmann::json jsn = nlohmann::json::parse(response.first);
-		// Check if bot api reports successfully processing , too 
-		success = jsn.value("ok", false);
-	}
+	bool success{ response.second && isResponseOk(response.first) };
 	return success; 
 }
 
@@ -34,14 +27,7 @@ bool tgb::TgBotHelper::sendPhoto(const long chatId, const std::string fileName) 
 	std::pair<std::string, bool> response{ CurlHelper::fileFormPost("https://api.telegram.org/bot" + m_token + 
 			"/sendPhoto?chat_id=" +  std::to_string(chatId), "photo", fileName) };
 	
-	bool success{ response.second };
-	if (success)
-	{
-		// Post was successful
-		nlohmann::json jsn = nlohmann::json::parse(response.first);
-		// Check if bot api reports successfully processing , too 
-		success = jsn.value("ok", false);
-	}
+	bool success{ response.second && isResponseOk(response.first) };
 	return success; 
 }
 
@@ -52,42 +38,36 @@ std::pair<std::vector<tgb::Message>, bool> tgb::TgBotHelper::getNewTextUpdates()
 			"offset=" + std::to_string(m_lastRetrieved + 1)) };
 	
 	std::vector<Message> messages;
-	bool success{ response.second };
+	
+	bool success{ response.second && isResponseOk(response.first) };
 	if (success)
 	{
-		// Post was successful
 		nlohmann::json jsn = nlohmann::json::parse(response.first);
-		// Check if bot api reports successfully processing , too 
-		success = jsn.value("ok", false);
-		if (success)
+		// Get all resulting updates
+		nlohmann::json::array_t resultArr = jsn.value("result", nlohmann::json::array_t());
+		for (auto entry : resultArr)
 		{
-			// Get all resulting updates
-			nlohmann::json::array_t resultArr = jsn.value("result", nlohmann::json::array_t());
-			for (auto entry : resultArr)
+			
+			long updateId{ entry.value("update_id", -1L) };		
+			// message		
+			nlohmann::json jsonMessage = entry.value("message", nlohmann::json());
+			long messageId{ jsonMessage.value("message_id", -1L) };
+			long date{ jsonMessage.value("date", -1L) };
+			std::string text{ jsonMessage.value("text", "") };
+			// message->chat
+			std::shared_ptr<Message::Chat> chat{ getChatFromJson(jsonMessage) };
+
+			// message->from.
+			std::shared_ptr<Message::User> user{ getUserFromJson(jsonMessage) };
+			
+			messages.push_back({ messageId, date, text, std::move(chat), std::move(user) });
+
+			// Make m_lastRetrieved update to actual update_id (When the update_id was in entry)
+			if (updateId > -1) 
 			{
-				
-				long updateId{ entry.value("update_id", -1L) };		
-				// message		
-				nlohmann::json jsonMessage = entry.value("message", nlohmann::json());
-				long messageId{ jsonMessage.value("message_id", -1L) };
-				long date{ jsonMessage.value("date", -1L) };
-				std::string text{ jsonMessage.value("text", "") };
-				// message->chat
-				std::shared_ptr<Message::Chat> chat{ getChatFromJson(jsonMessage) };
-
-				// message->from.
-				std::shared_ptr<Message::User> user{ getUserFromJson(jsonMessage) };
-				
-				messages.push_back({ messageId, date, text, std::move(chat), std::move(user) });
-
-				// Make m_lastRetrieved update to actual update_id (When the update_id was in entry)
-				if (updateId > -1) 
-				{
-					m_lastRetrieved = updateId;
-				}
-			}		
-		}
-
+				m_lastRetrieved = updateId;
+			}
+		}		
 	}
 	return std::make_pair(messages, success);
 }
@@ -139,4 +119,11 @@ std::shared_ptr<tgb::Message::User> tgb::TgBotHelper::getUserFromJson(const nloh
 			firstName, lastName);
 	}
 	return std::move(user);
+}
+
+bool tgb::TgBotHelper::isResponseOk(const std::string &response) const
+{
+	nlohmann::json jsn = nlohmann::json::parse(response);
+	// Check if bot api reports successfully processing , too 
+	return jsn.value("ok", false);
 }
