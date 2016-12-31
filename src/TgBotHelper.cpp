@@ -31,11 +31,8 @@ bool tgb::TgBotHelper::sendMessage(const long chatId, const std::string message)
 
 bool tgb::TgBotHelper::sendPhoto(const long chatId, const std::string fileName) const
 {
-
-	std::string command{ "chat_id=" + std::to_string(chatId) + " -F photo='@" + fileName + "'" };	
-	std::cout << "Command: " << command << std::endl;
-	std::pair<std::string, bool> response{ CurlHelper::simplePost("https://api.telegram.org/bot" + m_token + "/sendPhoto", 
-			command) };
+	std::pair<std::string, bool> response{ CurlHelper::fileFormPost("https://api.telegram.org/bot" + m_token + 
+			"/sendPhoto?chat_id=" +  std::to_string(chatId), "photo", fileName) };
 	
 	bool success{ response.second };
 	if (success)
