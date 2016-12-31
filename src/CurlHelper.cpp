@@ -28,13 +28,10 @@ std::pair<std::string, bool> CurlHelper::simplePost(const std::string &url, cons
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeToString);
 		// Perfom request. (Store return code in res)
 		CURLcode res{ curl_easy_perform(curl) };
-		if (res != CURLE_OK)
+		success = res == CURLE_OK;
+		if (!success)
 		{
 			std::cerr << "curl_easy_perfom failed: " << curl_easy_strerror(res) << std::endl;
-		}
-		else
-		{
-			success = true;
 		}
 		// Clean up
 		curl_easy_cleanup(curl);
@@ -76,13 +73,10 @@ std::pair<std::string, bool> CurlHelper::fileFormPost(const std::string &url, co
 		curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
 		// Perfom request. (Store return code in res)
 		CURLcode res{ curl_easy_perform(curl) };
-		if (res != CURLE_OK)
+		success = res == CURLE_OK;
+		if (!success)
 		{
 			std::cerr << "curl_easy_perfom failed: " << curl_easy_strerror(res) << std::endl;
-		}
-		else
-		{
-			success = true;
 		}
 		// Cleanup
 		curl_easy_cleanup(curl);
