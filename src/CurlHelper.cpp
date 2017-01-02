@@ -47,7 +47,6 @@ std::pair<std::string, bool> CurlHelper::fileFormPost(const std::string &url, co
 	bool success{ false };
 	// Remove old content from buffer
 	buffer.clear();
-
 	
 	curl_global_init(CURL_GLOBAL_ALL);
 
@@ -85,6 +84,41 @@ std::pair<std::string, bool> CurlHelper::fileFormPost(const std::string &url, co
 	}
 	curl_global_cleanup();
 	return std::make_pair(buffer, success);
+}
+
+
+bool CurlHelper::downloadAndSafeFile(const std::string &url, const std::string &fileDir)
+{	
+	curl_global_init(CURL_GLOBAL_ALL);
+	CURL *curl{ curl_easy_init() };
+	if (curl)
+	{
+		// Set url
+		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());	
+		
+		// Open file, so we can write the data into file later
+		FILE *file{ fopen(fileDir.c_str(), "w") };
+		if (!file)
+		{
+			std::cerr << "Error by opening file" << std::endl;
+			return false;
+		}
+		// Store data in file
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
+
+		// Perfom request. (Store return code in res)
+		CURLcode res{ curl_easy_perform(curl) };
+		if (res != CURLE_OK)
+		{
+			std::cerr << "curl_easy_perfom failed: " << curl_easy_strerror(res) << std::endl;
+			return false;
+		}
+		// Close file
+		fclose(file);
+		// Clean up
+		curl_easy_cleanup(curl);
+	}
+	return true;
 }
 
 /*

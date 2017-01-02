@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 		}
 
 	}
-	
+
 	tgBot.setOnNewMessageListener([&tgBot] (const std::vector<tgb::Message> &messages)
 	{
 		for (const tgb::Message message: messages)
@@ -52,15 +52,6 @@ int main(int argc, char *argv[])
 				
 	});
 
-	//bool success{ tgBot.sendMessage(chatId, "Hello Im a Bot =)") };
-	//if (success)
-	//{
-		//std::cout << "Message send" << std::endl;
-	//}
-	//else
-	//{
-		//std::cout << "Message send failed" << std::endl;
-	//}
 	while(true)
 	{
 		tgBot.handleUpdates();

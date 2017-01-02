@@ -38,7 +38,6 @@ std::pair<std::vector<tgb::Message>, bool> tgb::TgBotHelper::getNewTextUpdates()
 			"offset=" + std::to_string(m_lastRetrieved + 1)) };
 	
 	std::vector<Message> messages;
-	
 	bool success{ response.second && isResponseOk(response.first) };
 	if (success)
 	{
