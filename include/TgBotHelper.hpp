@@ -24,6 +24,7 @@ namespace tgb
 
 			bool sendMessage(const long chatId, const std::string &message) const;
 			bool sendPhoto(const long chatId, const std::string &fileName) const;
+
 			// Returns the essages and a bool which is true when the api call was successful
 			std::pair<std::vector<Message>, bool> getNewTextUpdates();
 			
@@ -33,6 +34,7 @@ namespace tgb
 		private:
 			std::shared_ptr<Message::Chat> getChatFromJson(const nlohmann::json &json) const;
 			std::shared_ptr<Message::User> getUserFromJson(const nlohmann::json &json) const;
+			std::shared_ptr<Message::Photo> getPhotoFromJson(const nlohmann::json &json) const;
 			// Returns true if the given string contains that the action of the response was successfully
 			bool isResponseOk(const std::string &response) const;
 

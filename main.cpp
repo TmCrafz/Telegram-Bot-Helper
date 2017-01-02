@@ -46,6 +46,13 @@ int main(int argc, char *argv[])
 			{
 				std::cout << " FirstName: " << message.user->firstName;
 			}
+			if (message.photo)
+			{
+				for (tgb::Message::PhotoSize photoSize: message.photo->photoSizes)
+				{
+					std::cout << " PhotoId: " << photoSize.fileId;
+				}
+			}
 			std::cout << std::endl;
 			tgBot.sendMessage(chatId, text);
 		}

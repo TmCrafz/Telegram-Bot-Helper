@@ -58,8 +58,10 @@ std::pair<std::vector<tgb::Message>, bool> tgb::TgBotHelper::getNewTextUpdates()
 
 			// message->from.
 			std::shared_ptr<Message::User> user{ getUserFromJson(jsonMessage) };
-			
-			messages.push_back({ messageId, date, text, std::move(chat), std::move(user) });
+			// message->photo
+			std::shared_ptr<Message::Photo> photo { getPhotoFromJson(jsonMessage) };
+
+			messages.push_back({ messageId, date, text, std::move(chat), std::move(user), std::move(photo) });
 
 			// Make m_lastRetrieved update to actual update_id (When the update_id was in entry)
 			if (updateId > -1) 
@@ -118,6 +120,27 @@ std::shared_ptr<tgb::Message::User> tgb::TgBotHelper::getUserFromJson(const nloh
 			firstName, lastName);
 	}
 	return std::move(user);
+}
+
+
+std::shared_ptr<tgb::Message::Photo> tgb::TgBotHelper::getPhotoFromJson(const nlohmann::json &json) const
+{
+	std::shared_ptr<Message::Photo> photo{ nullptr };
+	if (json.count("photo") > 0)
+	{
+		std::vector<Message::PhotoSize> photoSizes;
+		nlohmann::json::array_t jsonPhotoArr = json.value("photo", nlohmann::json::array_t());
+		for (auto jsonPhoto: jsonPhotoArr)
+		{
+			std::string fileId{ jsonPhoto.value("file_id", "") };
+			int width{ jsonPhoto.value("width", 0) };
+			int height{ jsonPhoto.value("height", 0) };
+			int fileSize{ jsonPhoto.value("file_size", 0) };
+			photoSizes.push_back({ fileId, width, height, fileSize });
+		}		
+		photo = std::make_shared<Message::Photo>(photoSizes);
+	}
+	return std::move(photo);
 }
 
 bool tgb::TgBotHelper::isResponseOk(const std::string &response) const
