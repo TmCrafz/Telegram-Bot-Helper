@@ -35,44 +35,61 @@ tgBot.handleUpdates();
 ````
 
 ### Example
+Echo Text which is send to the Bot and save Photo which are send to the bot in a specified path.
 ````cpp
-// Create TgBotHelper Instance
-tgb::TgBotHelper tgBot("Your Bot token");
-// Listener is called when a new message received. Add lambda to do stuff.
-tgBot.setOnNewMessageListener([&tgBot] (const std::vector<tgb::Message> &messages)
-{
-	for (const tgb::Message message: messages)
+#include <iostream>
+// Include library
+#include "include/TgBotHelper.hpp"
+
+int main(int argc, char *argv[])
+{		
+	std::string token{ "Your Bot token" };
+	std::string filePath{ "Path where to save received files" };
+	tgb::TgBotHelper tgBot(token);
+	// Set Listener with lambda expression, to specifiy what to do when new messages receive
+	tgBot.setOnNewMessageListener([&tgBot, &filePath] (const std::vector<tgb::Message> &messages)
 	{
-		// Get text which was send (Is empty when no text was send)
-		std::string text{ message.text };
-		// Get chat id of chat in which message was send
-		// If it is no group chat it is the same id as the id in message.user
-		long chatId{ message.chat->id };
-		// Data about user, who have send message
-		if (message.user)
+		// Loop over all messages
+		for (const tgb::Message message: messages)
 		{
-			std::cout << " FirstName: " << message.user->firstName;
-		}
-		// Photo was send
-		if (message.photo)
-		{
-			if (message.photo->photoSizes.size() > 0)
+			// The id of the chat in which message was send
+			long chatId{ message.chat->id };
+			if (!message.text.empty())
 			{
-				// In most cases the photo is available in different file sizes.
-				// Regulary the last PhotoSize object in the vector is the one with the
-				// original size.
-				const std::string photoId{ message.photo->photoSizes.back().fileId };
-				// Save photo with given photoId
-				tgBot.savePhoto(photoId, "Put FilePath Here");
+				// Message was send. Echo same text back
+				const std::string text{ message.text };			
+				tgBot.sendTextMessage(chatId, text);
 			}
-		}
+			if (message.photo)
+			{
+				// Photo was send. Save photo.
+				// In most cases the photo is available in different file sizes.
+				std::vector<tgb::Message::PhotoSize> photoSizes{ message.photo->photoSizes };					
+				if (photoSizes.size() > 0)
+				{
+					// Regulary the last PhotoSize object in the vector is the one with the
+					// original size. To save the photo we need its fileId
+					const std::string photoId{ photoSizes.back().fileId };
+					// Save Photo to specified file path and add its id as name
+					if (tgBot.savePhoto(photoId, filePath + photoId))
+					{
+						std::cout << "Photo successfully saved \n";
+					}
+					else
+					{
+						std::cout << "Error by saving photo \n";
+					}
+				}					
+			}
+		}				
+	});
+	while(true)
+	{
+		// Check for new updates. Listener is automatical called when there are
+		// new updates
+		tgBot.handleUpdates();
 	}
-			
-});
-while(true)
-{
-	// Check if updates are available and call listener when specified
-	tgBot.handleUpdates();
+	return 0;
 }
 ````
 

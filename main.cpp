@@ -1,14 +1,9 @@
-#include "include/CurlHelper.hpp"
-#include "include/libs/json.hpp"
-#include "include/Message.hpp"
 #include "include/TgBotHelper.hpp"
 #include <iostream>
-#include <string>
-#include <vector>
-#include "include/libs/json.hpp"
 
 int main(int argc, char *argv[])
 {
+
 	if (argc < 3) 
 	{
 		std::cout << "Please specify token and chatId" << std::endl;
@@ -16,69 +11,51 @@ int main(int argc, char *argv[])
 	}
 		
 	std::string token{ argv[1] };
-	std::string chatId{ argv[2] };
 	tgb::TgBotHelper tgBot(token);
-	// The path where received files get saved
-	std::string filePath{ "" };
-	if (argc >= 4)
-	{
-		filePath = argv[3];
-	}
+	// The path where received files get saved 
+	std::string filePath{ argv[2] };
 
 	tgBot.setOnNewMessageListener([&tgBot, &filePath] (const std::vector<tgb::Message> &messages)
 	{
+		// Loop over all messages
 		for (const tgb::Message message: messages)
 		{
-			std::string text{ message.text };
+			// The id of the chat in which message was send
 			long chatId{ message.chat->id };
-			std::cout << "Text: " << message.text << " ChatId: " << chatId; 
-			if (message.user)
+			if (!message.text.empty())
 			{
-				std::cout << " FirstName: " << message.user->firstName;
+				// Message was send. Echo same text back
+				const std::string text{ message.text };			
+				tgBot.sendTextMessage(chatId, text);
 			}
 			if (message.photo)
 			{
-				for (tgb::Message::PhotoSize photoSize: message.photo->photoSizes)
+				// Photo was send. Save photo.
+				// In most cases the photo is available in different file sizes.
+				std::vector<tgb::Message::PhotoSize> photoSizes{ message.photo->photoSizes };					
+				if (photoSizes.size() > 0)
 				{
-					std::cout << " PhotoId: " << photoSize.fileId;
-				}
-				if (message.photo->photoSizes.size() > 0)
-				{
-					// In most cases the photo is available in different file sizes.
 					// Regulary the last PhotoSize object in the vector is the one with the
-					// original size.
-					const std::string photoId{ message.photo->photoSizes.back().fileId };
-					tgBot.savePhoto(photoId, filePath + photoId);
-				}
+					// original size. To save the photo we need its fileId
+					const std::string photoId{ photoSizes.back().fileId };
+					// Save Photo to specified file path and add its id as name
+					if (tgBot.savePhoto(photoId, filePath + photoId))
+					{
+						std::cout << "Photo successfully saved \n";
+					}
+					else
+					{
+						std::cout << "Error by saving photo \n";
+					}
+				}					
 			}
-			std::cout << std::endl;
-			tgBot.sendTextMessage(chatId, text);
-		}
-				
+		}				
 	});
-
 	while(true)
 	{
+		// Check for new updates. Listener is automatical called when there are
+		// new updates
 		tgBot.handleUpdates();
-		//std::cout << "New Updates: \n";
-		//std::pair<std::vector<tgb::Message>, bool> result = 
-			//tgBot.getNewTextUpdates();
-		//if (!result.second)
-		//{
-			//std::cout << "Error by retrieving Messages" << std::endl;
-			//continue;
-		//}
-		//for (tgb::Message message: result.first)
-		//{
-			//std::cout << "ChatId: " << message.chatId << std::endl <<
-						//"ChatFirstName: " << message.chatFirstName << std::endl <<
-						//"Date: " << message.date << std::endl <<
-						//"AuthorId: " << message.authorId << std::endl <<
-						//"AuthorFirstName: " << message.authorFirstName << std::endl <<
-						//"MessageId: " << message.messageId << std::endl <<
-						//"Text: " << message.text << std::endl <<
-						//"UpdateId: " << message.updateId << std::endl << std::endl; 
-		//}
 	}
 	return 0;
 }
