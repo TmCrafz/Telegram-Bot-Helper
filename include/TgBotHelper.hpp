@@ -24,10 +24,13 @@ namespace tgb
 
 			bool sendMessage(const long chatId, const std::string &message) const;
 			bool sendPhoto(const long chatId, const std::string &fileName) const;
+			// Save the photo with the given fileId in the given fileName(path)
+			bool savePhoto(const std::string &fileId, const std::string fileName) const;
 
 			// Returns the essages and a bool which is true when the api call was successful
 			std::pair<std::vector<Message>, bool> getNewTextUpdates();
-			
+						
+
 			// Retrieve updates and call listeners
 			void handleUpdates();
 

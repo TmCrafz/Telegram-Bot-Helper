@@ -18,24 +18,13 @@ int main(int argc, char *argv[])
 	std::string token{ argv[1] };
 	std::string chatId{ argv[2] };
 	tgb::TgBotHelper tgBot(token);
-	if (argc > 3)
+	std::string filePath{ "" };
+	if (argc >= 4)
 	{
-		std::string fileName{ argv[3] };
-		//std::cout << "Filename: " << fileName << std::endl;
-		
-		bool success{ tgBot.sendPhoto(std::stol(chatId), fileName) };
-		if (success)
-		{
-			std::cout << "Successfully send Photo" << std::endl;
-		}
-		else
-		{
-			std::cout << "Error by sending Photo" << std::endl;
-		}
-
+		filePath = argv[3];
 	}
 
-	tgBot.setOnNewMessageListener([&tgBot] (const std::vector<tgb::Message> &messages)
+	tgBot.setOnNewMessageListener([&tgBot, &filePath] (const std::vector<tgb::Message> &messages)
 	{
 		for (const tgb::Message message: messages)
 		{
@@ -51,6 +40,14 @@ int main(int argc, char *argv[])
 				for (tgb::Message::PhotoSize photoSize: message.photo->photoSizes)
 				{
 					std::cout << " PhotoId: " << photoSize.fileId;
+				}
+				if (message.photo->photoSizes.size() > 0)
+				{
+					// In most cases the photo is available in different file sizes.
+					// Regulary the last PhotoSize object in the vector is the one with the
+					// original size.
+					const std::string photoId{ message.photo->photoSizes.back().fileId };
+					tgBot.savePhoto(photoId, filePath + photoId);
 				}
 			}
 			std::cout << std::endl;

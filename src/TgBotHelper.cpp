@@ -31,6 +31,27 @@ bool tgb::TgBotHelper::sendPhoto(const long chatId, const std::string &fileName)
 	return success; 
 }
 
+bool tgb::TgBotHelper::savePhoto(const std::string &fileId, const std::string fileName) const
+{
+	// Get info about file
+	std::pair<std::string, bool> response{ CurlHelper::simplePost("https://api.telegram.org/bot" + m_token + "/getFile", 
+			"file_id=" + fileId) };
+	
+	if(!response.second)
+	{
+		return false;
+	}
+	nlohmann::json jsn = nlohmann::json::parse(response.first);
+	const std::string filePath{ jsn.value("result", nlohmann::json()).value("file_path", "") };
+	// if there is no filePath in the result or the file path is empty there went something wrong
+	if (filePath.empty())
+	{
+		return false;
+	}
+	// Download the file
+	return CurlHelper::downloadAndSafeFile("https://api.telegram.org/file/bot" + m_token + "/" + filePath, fileName);	
+}
+
 std::pair<std::vector<tgb::Message>, bool> tgb::TgBotHelper::getNewTextUpdates()
 {
 	// With specifying the last retrieved message + 1, we guarantee that we only get updates we dont have already get 
