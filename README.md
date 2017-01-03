@@ -6,6 +6,9 @@ JSON for Modern C++
 https://github.com/nlohmann/json
 
 ## Usage
+You have to use a compiler which supports c++14 and specify that you want to compile with c++14.
+Also you have to add -lcurl to your compiler flags (because libcurl is needed).
+
 First include header (include path depends on the path of the lib)
 ````cpp
 #include "TgBotHelper.hpp" 
