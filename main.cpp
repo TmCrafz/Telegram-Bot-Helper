@@ -18,6 +18,7 @@ int main(int argc, char *argv[])
 	std::string token{ argv[1] };
 	std::string chatId{ argv[2] };
 	tgb::TgBotHelper tgBot(token);
+	// The path where received files get saved
 	std::string filePath{ "" };
 	if (argc >= 4)
 	{
@@ -51,7 +52,7 @@ int main(int argc, char *argv[])
 				}
 			}
 			std::cout << std::endl;
-			tgBot.sendMessage(chatId, text);
+			tgBot.sendTextMessage(chatId, text);
 		}
 				
 	});

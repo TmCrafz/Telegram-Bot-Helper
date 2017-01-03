@@ -20,16 +20,16 @@ namespace tgb
 		public:
 			explicit TgBotHelper(const std::string token);
 			
+			// Set Listener which is called when a new messaged receive
 			void setOnNewMessageListener(std::function<void(const std::vector<Message> &messages)> onNewMessageListener);
-
-			bool sendMessage(const long chatId, const std::string &message) const;
-			bool sendPhoto(const long chatId, const std::string &fileName) const;
+			// Send a simple text message to the chat with given chatId
+			bool sendTextMessage(const long chatId, const std::string &message) const;
+			// Send a photo to the chat with given chatId
+			bool sendPhotoMessage(const long chatId, const std::string &fileName) const;
 			// Save the photo with the given fileId in the given fileName(path)
 			bool savePhoto(const std::string &fileId, const std::string fileName) const;
-
-			// Returns the essages and a bool which is true when the api call was successful
-			std::pair<std::vector<Message>, bool> getNewTextUpdates();
-						
+			// Returns the messages and a bool which is true when the api call was successful
+			std::pair<std::vector<Message>, bool> getNewUpdates();
 
 			// Retrieve updates and call listeners
 			void handleUpdates();

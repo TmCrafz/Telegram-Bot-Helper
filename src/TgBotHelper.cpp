@@ -14,7 +14,7 @@ void tgb::TgBotHelper::setOnNewMessageListener(std::function<void(const std::vec
 	m_onNewMessageListener = onNewMessageListener;
 }
 
-bool tgb::TgBotHelper::sendMessage(const long chatId, const std::string &message) const
+bool tgb::TgBotHelper::sendTextMessage(const long chatId, const std::string &message) const
 {
 	std::pair<std::string, bool> response{ CurlHelper::simplePost("https://api.telegram.org/bot" + m_token + "/sendMessage", 
 			"chat_id=" + std::to_string(chatId) + "&text=" + message) };
@@ -22,7 +22,7 @@ bool tgb::TgBotHelper::sendMessage(const long chatId, const std::string &message
 	return success; 
 }
 
-bool tgb::TgBotHelper::sendPhoto(const long chatId, const std::string &fileName) const
+bool tgb::TgBotHelper::sendPhotoMessage(const long chatId, const std::string &fileName) const
 {
 	std::pair<std::string, bool> response{ CurlHelper::fileFormPost("https://api.telegram.org/bot" + m_token + 
 			"/sendPhoto?chat_id=" +  std::to_string(chatId), "photo", fileName) };
@@ -52,7 +52,7 @@ bool tgb::TgBotHelper::savePhoto(const std::string &fileId, const std::string fi
 	return CurlHelper::downloadAndSafeFile("https://api.telegram.org/file/bot" + m_token + "/" + filePath, fileName);	
 }
 
-std::pair<std::vector<tgb::Message>, bool> tgb::TgBotHelper::getNewTextUpdates()
+std::pair<std::vector<tgb::Message>, bool> tgb::TgBotHelper::getNewUpdates()
 {
 	// With specifying the last retrieved message + 1, we guarantee that we only get updates we dont have already get 
 	std::pair<std::string, bool> response{ CurlHelper::simplePost("https://api.telegram.org/bot" + m_token + "/getUpdates", 
@@ -96,7 +96,7 @@ std::pair<std::vector<tgb::Message>, bool> tgb::TgBotHelper::getNewTextUpdates()
 
 void tgb::TgBotHelper::handleUpdates()
 {
-	std::pair<std::vector<Message>, bool> resultUpdates{ getNewTextUpdates() };
+	std::pair<std::vector<Message>, bool> resultUpdates{ getNewUpdates() };
 	std::vector<Message> messages{ resultUpdates.first };
 	// Call the listener when there are new messages
 	if (messages.size() > 0 && m_onNewMessageListener)
