@@ -13,7 +13,8 @@ int main(int argc, char *argv[])
 	std::string token{ argv[1] };
 	tgb::TgBotHelper tgBot(token);
 	// The path where received files get saved 
-	std::string filePath{ argv[2] };
+	std::string filePath{ argv[3] };
+	std::cout << "FilePath: " << filePath << std::endl;
 
 	tgBot.setOnNewMessageListener([&tgBot, &filePath] (const std::vector<tgb::Message> &messages)
 	{
