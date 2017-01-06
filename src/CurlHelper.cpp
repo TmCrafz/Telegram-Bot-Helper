@@ -1,31 +1,36 @@
 #include "../include/CurlHelper.hpp"
 #include <curl/curl.h>
 #include <iostream>
+#include <sstream>
 
-std::string CurlHelper::buffer;
-
-size_t CurlHelper::writeToString(void *ptr, size_t size, size_t nmemb, void *stream)
+size_t CurlHelper::writeDataToStrStream(char *ptr, size_t size, size_t nmemb, void *userdata)
 {
-	buffer.append((char*) ptr, size * nmemb);
-	return size*nmemb;
+	std::ostringstream *stream = (std::ostringstream*) userdata;
+	size_t count = size * nmemb;
+	stream->write(ptr, count);
+	return count;
 }
 
 std::pair<std::string, bool> CurlHelper::simplePost(const std::string &url, const std::string &postFields)
 {
 	bool success{ false };
 	// Remove old content from buffer
-	buffer.clear();
+	//buffer.clear();
 	
 	curl_global_init(CURL_GLOBAL_ALL);
 	CURL *curl{ curl_easy_init() };
+	// Stream where to store result data
+	std::ostringstream stream;
 	if (curl)
 	{
 		// Set url (http:// or https://)
 		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());	
 		// Specify POST data
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postFields.c_str());
-		// Use helper function to store output in std::string
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeToString);
+
+		// Use helper function to store output in string stream
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeDataToStrStream);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &stream);
 		// Perfom request. (Store return code in res)
 		CURLcode res{ curl_easy_perform(curl) };
 		success = res == CURLE_OK;
@@ -37,7 +42,7 @@ std::pair<std::string, bool> CurlHelper::simplePost(const std::string &url, cons
 		curl_easy_cleanup(curl);
 	}
 	curl_global_cleanup();
-	return std::make_pair(buffer, success);
+	return std::make_pair(stream.str(), success);
 }
 
 
@@ -45,8 +50,6 @@ std::pair<std::string, bool> CurlHelper::fileFormPost(const std::string &url, co
 		const std::string &fileName)
 {
 	bool success{ false };
-	// Remove old content from buffer
-	buffer.clear();
 	
 	curl_global_init(CURL_GLOBAL_ALL);
 
@@ -62,12 +65,16 @@ std::pair<std::string, bool> CurlHelper::fileFormPost(const std::string &url, co
 
 	
 	CURL *curl = { curl_easy_init() };
+	// Stream where to store result data
+	std::ostringstream stream;
 	if (curl)
 	{
 		// Set url (http:// or https://)
-		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());	
-		// Use helper function to store output in std::string
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeToString);
+		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+
+		// Use helper function to store output in string stream
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeDataToStrStream);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &stream);
 		// Set the form post data
 		curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
 		// Perfom request. (Store return code in res)
@@ -83,7 +90,7 @@ std::pair<std::string, bool> CurlHelper::fileFormPost(const std::string &url, co
 		curl_formfree(formpost);
 	}
 	curl_global_cleanup();
-	return std::make_pair(buffer, success);
+	return std::make_pair(stream.str(), success);
 }
 
 

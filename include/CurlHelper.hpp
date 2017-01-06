@@ -5,10 +5,9 @@
 
 namespace CurlHelper
 {
-	extern std::string buffer;
-
-	// Helper function store curl output in string
-	size_t writeToString(void *ptr, size_t size, size_t nmemb, void *stream);
+	// Helper function to write data in string stream
+	size_t writeDataToStrStream(char *ptr, size_t size, size_t nmemb, void *userdata);
+	
 	// Simple post with parameters. Returns a pair with the response of the called url as first parameter
 	// and true as its second parameter 
 	std::pair<std::string, bool> simplePost(const std::string &url, const std::string &postFields);
