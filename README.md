@@ -3,7 +3,7 @@ Telegram-Bot-Helper implement some functionality of the Telegram Bot Api for eas
 
 ## Used Libraries:
 - libcurl
-- JSON for Modern C++ https://github.com/nlohmann/json
+- JSON for Modern C++ (included) https://github.com/nlohmann/json
 
 ## Usage
 You have to use a compiler which supports c++14 and specify that you want to compile with c++14.
