@@ -2,8 +2,8 @@
 Telegram-Bot-Helper implement some functionality of the Telegram Bot Api for easy use in C++. I have created this for another project, so it only have limited functionallity (send messages, get messages, send photos, save photos)
 
 ## Used Libraries:
-JSON for Modern C++
-https://github.com/nlohmann/json
+- libcurl
+- JSON for Modern C++ https://github.com/nlohmann/json
 
 ## Usage
 You have to use a compiler which supports c++14 and specify that you want to compile with c++14.
